@@ -13,11 +13,9 @@
             } ,
         data(){
            return{
-               content:'abc'
            }
         },
         mounted() {
-            console.log('Component mounted.')
         }
     }
 </script>
