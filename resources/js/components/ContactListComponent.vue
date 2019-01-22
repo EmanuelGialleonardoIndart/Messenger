@@ -12,11 +12,6 @@
              @click.native="selectConversation(conversation)">
 
             </contact-component>
-            <!--
-            <contact-component variant="info"></contact-component>
-            <contact-component variant="dark"></contact-component>
-            <contact-component variant="light"></contact-component>
-            -->
         </b-list-group>
     </div>    
 </template>

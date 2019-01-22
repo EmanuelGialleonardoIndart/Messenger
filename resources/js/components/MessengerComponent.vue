@@ -35,12 +35,22 @@
         mounted() {
             this.getConversations();
 
-            Echo.channel(`users.${this.userId}`)
+            Echo.private(`users.${this.userId}`)
             .listen('MessageSent', (data) => {
                 const message=data.message;
                 message.writtenByMe=false;
                 this.addMessage(message);
             });
+            Echo.join('messenger')
+                .here((users) => {
+                    users.forEach((user)=>this.changeStatus(user,true));
+                })
+                .joining((user) => {
+                     this.changeStatus(user,true);
+                })
+                .leaving((user) => {
+                    this.changeStatus(user,false);
+                });
         },
         methods:{
             getMessages(){
@@ -59,17 +69,30 @@
                 const author=this.userId===message.from_id ? 'Tú':conversation.contact_name;
                 conversation.last_message=`${author}: ${message.content}`;
                 conversation.last_time=message.created_at;
-
-                if(this.selectedConversation.contact_id==message.from_id
+                
+                if(this.selectedConversation){
+                   if(this.selectedConversation.contact_id==message.from_id
                    ||this.selectedConversation.contact_id==message.to_id){
                      this.messages.push(message);
+                   }
                 }
+                
             },
             getConversations(){
                 axios.get('/api/conversations')
                 .then((response)=>{
                     this.conversations=response.data; 
                 });
+            },
+            changeStatus(user,status){
+                const index=this.conversations.findIndex((conversation)=>{
+                         return conversation.contact_id==user.id
+                    });
+                    if(index>=0){
+                    Vue.set(this.conversations[index],'online',status);
+                    console.log(user.id);
+                    }
+
             }
         }
     }
